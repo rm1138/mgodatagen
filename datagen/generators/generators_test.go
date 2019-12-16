@@ -9,7 +9,7 @@ import (
 
 	"github.com/globalsign/mgo/bson"
 
-	"github.com/feliixx/mgodatagen/datagen/generators"
+	"datagen/generators"
 )
 
 const defaultSeed = 0

@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
+	"mgodatagen/datagen"
 	"os"
 
 	"github.com/jessevdk/go-flags"
-
-	"github.com/feliixx/mgodatagen/datagen"
 )
 
 const version = "0.7.5"

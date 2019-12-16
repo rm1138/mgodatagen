@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mgodatagen/datagen/generators"
 	"os"
 	"runtime"
 	"sort"
@@ -21,8 +22,6 @@ import (
 	"github.com/gosuri/uiprogress"
 	"github.com/gosuri/uiprogress/util/strutil"
 	"github.com/olekukonko/tablewriter"
-
-	"github.com/feliixx/mgodatagen/datagen/generators"
 )
 
 type result struct {

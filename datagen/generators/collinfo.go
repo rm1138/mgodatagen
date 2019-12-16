@@ -73,7 +73,9 @@ type Config struct {
 	// For `double` type only. Higher bound for the float64 to generate
 	MaxDouble float64 `json:"maxDouble"`
 	// For `array` only. Size of the array
-	Size int `json:"size"`
+	Size    int    `json:"size"`
+	MinSize uint32 `json:"minSize"`
+	MaxSize uint32 `json:"maxSize"`
 	// For `array` only. Config to fill the array. Need to
 	// pass a pointer here to avoid 'invalid recursive type' error
 	ArrayContent *Config `json:"arrayContent"`
@@ -364,9 +366,9 @@ func (ci *CollInfo) newGenerator(buffer *DocBuffer, key string, config *Config) 
 		return &objectIDGenerator{base: base}, nil
 
 	case TypeArray:
-		if config.Size <= 0 {
-			return nil, errors.New("make sure that 'size' >= 0")
-		}
+		// if config.Size < 0 {
+		// 	return nil, errors.New("make sure that 'size' >= 0")
+		// }
 		g, err := ci.newGenerator(buffer, "", config.ArrayContent)
 		if err != nil {
 			return nil, err
@@ -400,7 +402,8 @@ func (ci *CollInfo) newGenerator(buffer *DocBuffer, key string, config *Config) 
 
 		return &arrayGenerator{
 			base:      base,
-			size:      config.Size,
+			minSize:   config.MinSize,
+			maxSize:   config.MaxSize,
 			generator: g,
 		}, nil
 

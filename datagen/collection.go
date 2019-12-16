@@ -3,11 +3,10 @@ package datagen
 import (
 	"encoding/json"
 	"fmt"
+	"mgodatagen/datagen/generators"
 
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
-
-	"github.com/feliixx/mgodatagen/datagen/generators"
 )
 
 // Collection struct storing global collection info

@@ -18,7 +18,7 @@ import (
 	"github.com/MichaelTJones/pcg"
 	"github.com/globalsign/mgo/bson"
 	"github.com/manveru/faker"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 // DocumentGenerator is a Generator for creating random bson documents
@@ -296,7 +296,8 @@ var indexesBytes = [10]byte{
 // Generator for creating random array
 type arrayGenerator struct {
 	base
-	size      int
+	minSize   uint32
+	maxSize   uint32
 	generator Generator
 }
 
@@ -306,7 +307,13 @@ func (g *arrayGenerator) Value() {
 	// array looks like this:
 	// size (byte(index) byte(0) value)... byte(0)
 	// where index is a string: ["1", "2", "3"...]
-	for i := 0; i < g.size; i++ {
+
+	length := g.minSize
+	if g.minSize != g.maxSize {
+		length = g.pcg32.Bounded(g.maxSize-g.minSize+1) + g.minSize
+	}
+
+	for i := 0; i < int(length); i++ {
 		g.buffer.WriteSingleByte(g.generator.Type())
 		if i < 10 {
 			g.buffer.WriteSingleByte(indexesBytes[i])

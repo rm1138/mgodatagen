@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/feliixx/mgodatagen/datagen"
+	"mgodatagen/datagen"
 )
 
 func TestParseConfig(t *testing.T) {

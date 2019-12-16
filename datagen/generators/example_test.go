@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/feliixx/mgodatagen/datagen/generators"
+	"datagen/generators"
+
 	"github.com/globalsign/mgo/bson"
 )
 
