@@ -105,7 +105,8 @@ type Config struct {
 	// for this field
 	ID int `json:"id"`
 	// For `ref` type only. generator for the field
-	RefContent *Config `json:"refContent"`
+	RefContent   *Config           `json:"refContent"`
+	OneOfContent map[string]Config `json:"oneOfContent"`
 	// For `countAggregator`, `boundAggregator` and `valueAggregator` only
 	Collection string `json:"collection"`
 	// For `countAggregator`, `boundAggregator` and `valueAggregator` only
@@ -136,6 +137,7 @@ const (
 	TypeDate          = "date"
 	TypeUUID          = "uuid"
 	TypeFaker         = "faker"
+	TypeOneOf         = "oneOf"
 )
 
 // available aggregator types
@@ -181,25 +183,25 @@ const (
 )
 
 var mapTypes = map[string]byte{
-	TypeString:        bson.ElementString,
-	TypeInt:           bson.ElementInt32,
-	TypeLong:          bson.ElementInt64,
-	TypeDouble:        bson.ElementFloat64,
-	TypeDecimal:       bson.ElementDecimal128,
-	TypeBoolean:       bson.ElementBool,
-	TypeObjectID:      bson.ElementObjectId,
-	TypeArray:         bson.ElementArray,
-	TypePosition:      bson.ElementArray,
-	TypeObject:        bson.ElementDocument,
-	TypeFromArray:     bson.ElementNil, // can be of any bson type
-	TypeConstant:      bson.ElementNil, // can be of any bson type
-	TypeRef:           bson.ElementNil, // can be of any bson type
-	TypeAutoincrement: bson.ElementNil, // type bson.ElementInt32 or bson.ElementInt64
-	TypeBinary:        bson.ElementBinary,
-	TypeDate:          bson.ElementDatetime,
-	TypeUUID:          bson.ElementString,
-	TypeFaker:         bson.ElementString,
-
+	TypeString:          bson.ElementString,
+	TypeInt:             bson.ElementInt32,
+	TypeLong:            bson.ElementInt64,
+	TypeDouble:          bson.ElementFloat64,
+	TypeDecimal:         bson.ElementDecimal128,
+	TypeBoolean:         bson.ElementBool,
+	TypeObjectID:        bson.ElementObjectId,
+	TypeArray:           bson.ElementArray,
+	TypePosition:        bson.ElementArray,
+	TypeObject:          bson.ElementDocument,
+	TypeFromArray:       bson.ElementNil, // can be of any bson type
+	TypeConstant:        bson.ElementNil, // can be of any bson type
+	TypeRef:             bson.ElementNil, // can be of any bson type
+	TypeOneOf:           bson.ElementDocument,
+	TypeAutoincrement:   bson.ElementNil, // type bson.ElementInt32 or bson.ElementInt64
+	TypeBinary:          bson.ElementBinary,
+	TypeDate:            bson.ElementDatetime,
+	TypeUUID:            bson.ElementString,
+	TypeFaker:           bson.ElementString,
 	TypeCountAggregator: bson.ElementNil,
 	TypeValueAggregator: bson.ElementNil,
 	TypeBoundAggregator: bson.ElementNil,
@@ -529,6 +531,22 @@ func (ci *CollInfo) newGenerator(buffer *DocBuffer, key string, config *Config) 
 			index:         0,
 			doNotTruncate: true,
 		}, nil
+
+	case TypeOneOf:
+		emg := &oneOfObjectGenerator{
+			base:       base,
+			generators: make([]Generator, 0, len(config.OneOfContent)),
+		}
+		for k, v := range config.OneOfContent {
+			g, err := ci.newGenerator(buffer, k, &v)
+			if err != nil {
+				return nil, err
+			}
+			if g != nil {
+				emg.generators = append(emg.generators, g)
+			}
+		}
+		return emg, nil
 	}
 	return nil, nil
 }

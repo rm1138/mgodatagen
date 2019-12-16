@@ -275,6 +275,32 @@ func (g *embeddedObjectGenerator) Value() {
 	g.buffer.WriteAt(current, int32Bytes(int32(g.buffer.Len()-current)))
 }
 
+// Generator for creating embedded documents with one of the field
+type oneOfObjectGenerator struct {
+	base
+	generators []Generator
+}
+
+func (g *oneOfObjectGenerator) Value() {
+	current := g.buffer.Len()
+	g.buffer.Reserve()
+
+	target := int(g.pcg32.Bounded(uint32(len(g.generators))))
+
+	for idx, gen := range g.generators {
+		if target == idx {
+			if gen.Type() != bson.ElementNil {
+				g.buffer.WriteSingleByte(gen.Type())
+				g.buffer.Write(gen.Key())
+				g.buffer.WriteSingleByte(byte(0))
+			}
+			gen.Value()
+		}
+	}
+	g.buffer.WriteSingleByte(byte(0))
+	g.buffer.WriteAt(current, int32Bytes(int32(g.buffer.Len()-current)))
+}
+
 // precomputed index. Most of the array
 // will be of short length, so precompute
 // the first indexes values to avoid calls
