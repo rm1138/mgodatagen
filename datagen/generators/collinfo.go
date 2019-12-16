@@ -76,6 +76,7 @@ type Config struct {
 	Size    int    `json:"size"`
 	MinSize uint32 `json:"minSize"`
 	MaxSize uint32 `json:"maxSize"`
+	Locale  string `json:"locale"`
 	// For `array` only. Config to fill the array. Need to
 	// pass a pointer here to avoid 'invalid recursive type' error
 	ArrayContent *Config `json:"arrayContent"`
@@ -256,7 +257,6 @@ func (ci *CollInfo) NewDocumentGenerator(content map[string]Config) (*DocumentGe
 }
 
 func (ci *CollInfo) newGenerator(buffer *DocBuffer, key string, config *Config) (Generator, error) {
-
 	if config.NullPercentage > 100 || config.NullPercentage < 0 {
 		return nil, errors.New("null percentage has to be between 0 and 100")
 	}
@@ -493,7 +493,11 @@ func (ci *CollInfo) newGenerator(buffer *DocBuffer, key string, config *Config) 
 
 	case TypeFaker:
 		// TODO: use "en" locale for now, but should be configurable
-		fk, err := faker.New("en")
+		locale := "en"
+		if config.Locale != "" {
+			locale = config.Locale
+		}
+		fk, err := faker.New(locale)
 		if err != nil {
 			return nil, fmt.Errorf("fail to instantiate faker generator: %v", err)
 		}
